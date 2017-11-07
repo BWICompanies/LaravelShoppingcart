@@ -371,7 +371,7 @@ class Cart
      * @param mixed $identifier
      * @return void
      */
-    public function restore($identifier)
+    public function restore($identifier, $mergeExistingSession = false)
     {
         if( ! $this->storedCartWithIdentifierExists($identifier)) {
             return;
@@ -385,6 +385,10 @@ class Cart
         $currentInstance = $this->currentInstance();
 
         $this->instance($stored->instance);
+
+        if(!$mergeExistingSession) {
+            $this->destroy();
+        }
 
         $content = $this->getContent();
 

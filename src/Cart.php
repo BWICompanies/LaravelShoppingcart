@@ -357,6 +357,7 @@ class Cart
         ];
 
         if ($this->storedCartWithIdentifierExists($identifier)) {
+            unset($cartData["identifier"]);
             $this->getConnection()->table($this->getTableName())->update($cartData);
         } else {
             $this->getConnection()->table($this->getTableName())->insert($cartData);

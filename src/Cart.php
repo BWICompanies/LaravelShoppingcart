@@ -25,7 +25,7 @@ class Cart
 
     /**
      * Instance of the event dispatcher.
-     * 
+     *
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
     private $events;
@@ -103,7 +103,7 @@ class Cart
         }
 
         $content->put($cartItem->rowId, $cartItem);
-        
+
         $this->events->fire('cart.added', $cartItem);
 
         $this->session->put($this->instance, $content);
@@ -357,8 +357,21 @@ class Cart
         ];
 
         if ($this->storedCartWithIdentifierExists($identifier)) {
+            $identifier = $cartData["identifier"];
+
+            $items = $this->getConnection()->table($this->getTableName())->where('identifier', $identifier)->get();
+
+            if($items->count() == 0) {
+                throw new \Exception("Could not find existing cart row for identifier: " . $identifier);
+            }
+
+            if($items->count() > 1) {
+                Log::warn("More than one cart found for identifier: " . $identifier);
+            }
+
             unset($cartData["identifier"]);
-            $this->getConnection()->table($this->getTableName())->update($cartData);
+
+            $this->getConnection()->table($this->getTableName())->where('identifier', $identifier)->update($cartData);
         } else {
             $this->getConnection()->table($this->getTableName())->insert($cartData);
         }
